@@ -30,8 +30,9 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Database
-*.db
+# *.db - теперь не игнорируется (база данных нужна в репозитории)
 *.db.old
+!ViCRM.db
 !ViCRM_conf.db
 !ViCRM_conf.db.old
 
