@@ -1,0 +1,90 @@
+# ===========================================
+# ViCRM .gitignore
+# ===========================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Node.js
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Database
+*.db
+*.db.old
+!ViCRM_conf.db
+!ViCRM_conf.db.old
+
+# Backups (опционально - можно закоммитить для важных бэкапов)
+# backups/
+# backend/backups/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Qwen
+.qwen/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Test files
+test_*.py
+test_*.js
+check_*.py
+debug_*.py
+*_test.py
+TESTING.md
+diagnostics*.md
+FULL_DIAGNOSTICS.md
+test_*.html
+participants_api.json
+
+# Scripts (удалены)
+assign_participants.py
+recalculate_participants.py
+reset_participants.py
+fix.ps1
+create.bat
+
+# Other
+$null
+

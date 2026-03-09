@@ -1,0 +1,24 @@
+// ===================================
+// ИМПОРТ ВСЕХ СТИЛЕЙ
+// ===================================
+
+// 1. Переменные (темы, цвета)
+import './variables.css'
+
+// 2. Базовые стили
+import './base.css'
+
+// 3. Компоненты
+import './components/layout.css'
+import './components/cards.css'
+import './components/tables.css'
+import './components/buttons.css'
+import './components/forms.css'
+import './components/modals.css'
+import './components/navigation.css'
+
+// 4. Эффекты (прозрачность)
+import './effects/glass-effects.css'
+
+// 5. Утилиты (адаптивность)
+import './utilities/responsive.css'

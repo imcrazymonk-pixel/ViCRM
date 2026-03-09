@@ -1,0 +1,114 @@
+/* ===================================
+   МОДАЛЬНЫЕ ОКНА (MODALS)
+   =================================== */
+
+.modal {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  display: none;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-dialog {
+  margin: 100px auto;
+  max-width: 500px;
+}
+
+.modal-dialog.modal-sm {
+  max-width: 400px;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header.bg-primary {
+  background: var(--gradient-primary) !important;
+  border: none;
+}
+
+.modal-header.bg-success {
+  background: var(--gradient-income) !important;
+  border: none;
+}
+
+.modal-header.bg-danger {
+  background: var(--gradient-expense) !important;
+  border: none;
+}
+
+.modal-title {
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-close-white {
+  filter: brightness(2);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  width: 1em;
+  height: 1em;
+  opacity: 0.7;
+}
+
+.btn-close-white:hover {
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-footer {
+  padding: 15px 25px 25px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-footer.border-0 {
+  border: none;
+}
+
+.list-group-item {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+  padding: 15px;
+}
+
+.list-group-item:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--accent-primary);
+}
+
+.list-group-item .text-white {
+  color: var(--text-primary) !important;
+}
+
+.list-group-item .text-muted {
+  color: var(--text-muted) !important;
+}

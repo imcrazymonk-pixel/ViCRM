@@ -1,0 +1,63 @@
+/* ===================================
+   CSS ПЕРЕМЕННЫЕ (THEMES)
+   =================================== */
+
+:root {
+  /* Тёмная тема (по умолчанию) */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: rgba(25, 25, 35, 0.8);
+  --bg-glass: rgba(30, 30, 45, 0.7);
+
+  --accent-primary: #8b5cf6;
+  --accent-secondary: #a78bfa;
+  --accent-glow: rgba(139, 92, 246, 0.5);
+
+  --income-primary: #10b981;
+  --income-glow: rgba(16, 185, 129, 0.4);
+
+  --expense-primary: #ef4444;
+  --expense-glow: rgba(239, 68, 68, 0.4);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-glow: rgba(139, 92, 246, 0.3);
+
+  --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  --gradient-income: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-expense: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --gradient-bg: linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 100%);
+}
+
+/* Светлая тема */
+[data-theme="light"] {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+
+  --accent-primary: #6366f1;
+  --accent-secondary: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.2);
+
+  --income-primary: #059669;
+  --income-glow: rgba(5, 150, 105, 0.2);
+
+  --expense-primary: #dc2626;
+  --expense-glow: rgba(220, 38, 38, 0.2);
+
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-muted: #71717a;
+
+  --border-color: rgba(0, 0, 0, 0.1);
+  --border-glow: rgba(99, 102, 241, 0.3);
+
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  --gradient-income: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --gradient-expense: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  --gradient-bg: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+}

@@ -1,0 +1,309 @@
+/* ===================================
+   ЭФФЕКТЫ ПРОЗРАЧНОСТИ (GLASS EFFECTS)
+   =================================== */
+
+/* Единый класс для всех блоков с эффектами */
+.glass-block {
+  background: var(--bg-card, rgba(25, 25, 35, 0.8));
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+/* ===================================
+   SOLID - НЕПРОЗРАЧНЫЕ БЛОКИ
+   =================================== */
+:root[data-glass-effect="solid"] .glass-block,
+html[data-glass-effect="solid"] .glass-block,
+:root[data-glass-effect="solid"] .action-card,
+html[data-glass-effect="solid"] .action-card,
+:root[data-glass-effect="solid"] .summary-card,
+html[data-glass-effect="solid"] .summary-card,
+:root[data-glass-effect="solid"] .modal-content,
+html[data-glass-effect="solid"] .modal-content,
+:root[data-glass-effect="solid"] .chart-container,
+html[data-glass-effect="solid"] .chart-container,
+:root[data-glass-effect="solid"] .summary-info-card,
+html[data-glass-effect="solid"] .summary-info-card,
+:root[data-glass-effect="solid"] .stat-card,
+html[data-glass-effect="solid"] .stat-card,
+:root[data-glass-effect="solid"] .filters-container,
+html[data-glass-effect="solid"] .filters-container,
+:root[data-glass-effect="solid"] .compact-template-form,
+html[data-glass-effect="solid"] .compact-template-form,
+:root[data-glass-effect="solid"] .compact-template-item,
+html[data-glass-effect="solid"] .compact-template-item,
+:root[data-glass-effect="solid"] .recurring-transactions,
+html[data-glass-effect="solid"] .recurring-transactions,
+:root[data-glass-effect="solid"] .backup-card,
+html[data-glass-effect="solid"] .backup-card,
+:root[data-glass-effect="solid"] .tag-card,
+html[data-glass-effect="solid"] .tag-card {
+  background: var(--bg-secondary) !important;
+  backdrop-filter: none !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* ===================================
+   LIGHT GLASS - ЛЁГКАЯ ПРОЗРАЧНОСТЬ
+   =================================== */
+:root[data-glass-effect="light"] .glass-block,
+html[data-glass-effect="light"] .glass-block,
+:root[data-glass-effect="light"] .action-card,
+html[data-glass-effect="light"] .action-card,
+:root[data-glass-effect="light"] .summary-card,
+html[data-glass-effect="light"] .summary-card,
+:root[data-glass-effect="light"] .modal-content,
+html[data-glass-effect="light"] .modal-content,
+:root[data-glass-effect="light"] .chart-container,
+html[data-glass-effect="light"] .chart-container,
+:root[data-glass-effect="light"] .summary-info-card,
+html[data-glass-effect="light"] .summary-info-card,
+:root[data-glass-effect="light"] .stat-card,
+html[data-glass-effect="light"] .stat-card,
+:root[data-glass-effect="light"] .filters-container,
+html[data-glass-effect="light"] .filters-container,
+:root[data-glass-effect="light"] .compact-template-form,
+html[data-glass-effect="light"] .compact-template-form,
+:root[data-glass-effect="light"] .compact-template-item,
+html[data-glass-effect="light"] .compact-template-item,
+:root[data-glass-effect="light"] .recurring-transactions,
+html[data-glass-effect="light"] .recurring-transactions,
+:root[data-glass-effect="light"] .backup-card,
+html[data-glass-effect="light"] .backup-card,
+:root[data-glass-effect="light"] .tag-card,
+html[data-glass-effect="light"] .tag-card {
+  background: rgba(30, 30, 45, 0.5) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+:root[data-theme="light"][data-glass-effect="light"] .glass-block,
+html[data-theme="light"][data-glass-effect="light"] .glass-block,
+:root[data-theme="light"][data-glass-effect="light"] .action-card,
+html[data-theme="light"][data-glass-effect="light"] .action-card,
+:root[data-theme="light"][data-glass-effect="light"] .summary-card,
+html[data-theme="light"][data-glass-effect="light"] .summary-card,
+:root[data-theme="light"][data-glass-effect="light"] .modal-content,
+html[data-theme="light"][data-glass-effect="light"] .modal-content,
+:root[data-theme="light"][data-glass-effect="light"] .chart-container,
+html[data-theme="light"][data-glass-effect="light"] .chart-container,
+:root[data-theme="light"][data-glass-effect="light"] .summary-info-card,
+html[data-theme="light"][data-glass-effect="light"] .summary-info-card,
+:root[data-theme="light"][data-glass-effect="light"] .stat-card,
+html[data-theme="light"][data-glass-effect="light"] .stat-card,
+:root[data-theme="light"][data-glass-effect="light"] .filters-container,
+html[data-theme="light"][data-glass-effect="light"] .filters-container {
+  background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ===================================
+   DEEP GLASS - УСИЛЕННОЕ РАЗМЫТИЕ
+   =================================== */
+:root[data-glass-effect="deep"] .glass-block,
+html[data-glass-effect="deep"] .glass-block,
+:root[data-glass-effect="deep"] .action-card,
+html[data-glass-effect="deep"] .action-card,
+:root[data-glass-effect="deep"] .summary-card,
+html[data-glass-effect="deep"] .summary-card,
+:root[data-glass-effect="deep"] .modal-content,
+html[data-glass-effect="deep"] .modal-content,
+:root[data-glass-effect="deep"] .chart-container,
+html[data-glass-effect="deep"] .chart-container,
+:root[data-glass-effect="deep"] .summary-info-card,
+html[data-glass-effect="deep"] .summary-info-card,
+:root[data-glass-effect="deep"] .stat-card,
+html[data-glass-effect="deep"] .stat-card,
+:root[data-glass-effect="deep"] .filters-container,
+html[data-glass-effect="deep"] .filters-container,
+:root[data-glass-effect="deep"] .compact-template-form,
+html[data-glass-effect="deep"] .compact-template-form,
+:root[data-glass-effect="deep"] .compact-template-item,
+html[data-glass-effect="deep"] .compact-template-item,
+:root[data-glass-effect="deep"] .recurring-transactions,
+html[data-glass-effect="deep"] .recurring-transactions,
+:root[data-glass-effect="deep"] .backup-card,
+html[data-glass-effect="deep"] .backup-card,
+:root[data-glass-effect="deep"] .tag-card,
+html[data-glass-effect="deep"] .tag-card {
+  background: rgba(20, 20, 30, 0.4) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+:root[data-theme="light"][data-glass-effect="deep"] .glass-block,
+html[data-theme="light"][data-glass-effect="deep"] .glass-block,
+:root[data-theme="light"][data-glass-effect="deep"] .action-card,
+html[data-theme="light"][data-glass-effect="deep"] .action-card,
+:root[data-theme="light"][data-glass-effect="deep"] .summary-card,
+html[data-theme="light"][data-glass-effect="deep"] .summary-card,
+:root[data-theme="light"][data-glass-effect="deep"] .modal-content,
+html[data-theme="light"][data-glass-effect="deep"] .modal-content,
+:root[data-theme="light"][data-glass-effect="deep"] .chart-container,
+html[data-theme="light"][data-glass-effect="deep"] .chart-container,
+:root[data-theme="light"][data-glass-effect="deep"] .summary-info-card,
+html[data-theme="light"][data-glass-effect="deep"] .summary-info-card,
+:root[data-theme="light"][data-glass-effect="deep"] .stat-card,
+html[data-theme="light"][data-glass-effect="deep"] .stat-card,
+:root[data-theme="light"][data-glass-effect="deep"] .filters-container,
+html[data-theme="light"][data-glass-effect="deep"] .filters-container {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* ===================================
+   NEON GLASS - СВЕЧЕНИЕ ПО КРАЯМ
+   =================================== */
+:root[data-glass-effect="neon"] .glass-block,
+html[data-glass-effect="neon"] .glass-block,
+:root[data-glass-effect="neon"] .action-card,
+html[data-glass-effect="neon"] .action-card,
+:root[data-glass-effect="neon"] .summary-card,
+html[data-glass-effect="neon"] .summary-card,
+:root[data-glass-effect="neon"] .modal-content,
+html[data-glass-effect="neon"] .modal-content,
+:root[data-glass-effect="neon"] .chart-container,
+html[data-glass-effect="neon"] .chart-container,
+:root[data-glass-effect="neon"] .summary-info-card,
+html[data-glass-effect="neon"] .summary-info-card,
+:root[data-glass-effect="neon"] .stat-card,
+html[data-glass-effect="neon"] .stat-card,
+:root[data-glass-effect="neon"] .filters-container,
+html[data-glass-effect="neon"] .filters-container,
+:root[data-glass-effect="neon"] .compact-template-form,
+html[data-glass-effect="neon"] .compact-template-form,
+:root[data-glass-effect="neon"] .compact-template-item,
+html[data-glass-effect="neon"] .compact-template-item,
+:root[data-glass-effect="neon"] .recurring-transactions,
+html[data-glass-effect="neon"] .recurring-transactions,
+:root[data-glass-effect="neon"] .backup-card,
+html[data-glass-effect="neon"] .backup-card,
+:root[data-glass-effect="neon"] .tag-card,
+html[data-glass-effect="neon"] .tag-card {
+  background: rgba(30, 30, 45, 0.6) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(139, 92, 246, 0.4) !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.2), inset 0 0 20px rgba(139, 92, 246, 0.05) !important;
+}
+
+:root[data-glass-effect="neon"] .glass-block:hover,
+html[data-glass-effect="neon"] .glass-block:hover,
+:root[data-glass-effect="neon"] .action-card:hover,
+html[data-glass-effect="neon"] .action-card:hover,
+:root[data-glass-effect="neon"] .summary-card:hover,
+html[data-glass-effect="neon"] .summary-card:hover,
+:root[data-glass-effect="neon"] .chart-container:hover,
+html[data-glass-effect="neon"] .chart-container:hover,
+:root[data-glass-effect="neon"] .summary-info-card:hover,
+html[data-glass-effect="neon"] .summary-info-card:hover,
+:root[data-glass-effect="neon"] .stat-card:hover,
+html[data-glass-effect="neon"] .stat-card:hover,
+:root[data-glass-effect="neon"] .filters-container:hover,
+html[data-glass-effect="neon"] .filters-container:hover {
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.4), inset 0 0 30px rgba(139, 92, 246, 0.1) !important;
+}
+
+:root[data-theme="light"][data-glass-effect="neon"] .glass-block,
+html[data-theme="light"][data-glass-effect="neon"] .glass-block,
+:root[data-theme="light"][data-glass-effect="neon"] .action-card,
+html[data-theme="light"][data-glass-effect="neon"] .action-card,
+:root[data-theme="light"][data-glass-effect="neon"] .summary-card,
+html[data-theme="light"][data-glass-effect="neon"] .summary-card,
+:root[data-theme="light"][data-glass-effect="neon"] .modal-content,
+html[data-theme="light"][data-glass-effect="neon"] .modal-content,
+:root[data-theme="light"][data-glass-effect="neon"] .chart-container,
+html[data-theme="light"][data-glass-effect="neon"] .chart-container,
+:root[data-theme="light"][data-glass-effect="neon"] .summary-info-card,
+html[data-theme="light"][data-glass-effect="neon"] .summary-info-card,
+:root[data-theme="light"][data-glass-effect="neon"] .stat-card,
+html[data-theme="light"][data-glass-effect="neon"] .stat-card,
+:root[data-theme="light"][data-glass-effect="neon"] .filters-container,
+html[data-theme="light"][data-glass-effect="neon"] .filters-container {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2), inset 0 0 20px rgba(99, 102, 241, 0.05) !important;
+}
+
+/* ===================================
+   GRADIENT GLASS - ГРАДИЕНТНАЯ ПРОЗРАЧНОСТЬ
+   =================================== */
+:root[data-glass-effect="gradient"] .glass-block,
+html[data-glass-effect="gradient"] .glass-block,
+:root[data-glass-effect="gradient"] .action-card,
+html[data-glass-effect="gradient"] .action-card,
+:root[data-glass-effect="gradient"] .summary-card,
+html[data-glass-effect="gradient"] .summary-card,
+:root[data-glass-effect="gradient"] .modal-content,
+html[data-glass-effect="gradient"] .modal-content,
+:root[data-glass-effect="gradient"] .chart-container,
+html[data-glass-effect="gradient"] .chart-container,
+:root[data-glass-effect="gradient"] .summary-info-card,
+html[data-glass-effect="gradient"] .summary-info-card,
+:root[data-glass-effect="gradient"] .stat-card,
+html[data-glass-effect="gradient"] .stat-card,
+:root[data-glass-effect="gradient"] .filters-container,
+html[data-glass-effect="gradient"] .filters-container,
+:root[data-glass-effect="gradient"] .compact-template-form,
+html[data-glass-effect="gradient"] .compact-template-form,
+:root[data-glass-effect="gradient"] .compact-template-item,
+html[data-glass-effect="gradient"] .compact-template-item,
+:root[data-glass-effect="gradient"] .recurring-transactions,
+html[data-glass-effect="gradient"] .recurring-transactions,
+:root[data-glass-effect="gradient"] .backup-card,
+html[data-glass-effect="gradient"] .backup-card,
+:root[data-glass-effect="gradient"] .tag-card,
+html[data-glass-effect="gradient"] .tag-card {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.1)) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15) !important;
+}
+
+:root[data-glass-effect="gradient"] .glass-block:hover,
+html[data-glass-effect="gradient"] .glass-block:hover,
+:root[data-glass-effect="gradient"] .action-card:hover,
+html[data-glass-effect="gradient"] .action-card:hover,
+:root[data-glass-effect="gradient"] .summary-card:hover,
+html[data-glass-effect="gradient"] .summary-card:hover,
+:root[data-glass-effect="gradient"] .chart-container:hover,
+html[data-glass-effect="gradient"] .chart-container:hover,
+:root[data-glass-effect="gradient"] .summary-info-card:hover,
+html[data-glass-effect="gradient"] .summary-info-card:hover,
+:root[data-glass-effect="gradient"] .stat-card:hover,
+html[data-glass-effect="gradient"] .stat-card:hover,
+:root[data-glass-effect="gradient"] .filters-container:hover,
+html[data-glass-effect="gradient"] .filters-container:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.15)) !important;
+  box-shadow: 0 6px 30px rgba(139, 92, 246, 0.25) !important;
+}
+
+:root[data-theme="light"][data-glass-effect="gradient"] .glass-block,
+html[data-theme="light"][data-glass-effect="gradient"] .glass-block,
+:root[data-theme="light"][data-glass-effect="gradient"] .action-card,
+html[data-theme="light"][data-glass-effect="gradient"] .action-card,
+:root[data-theme="light"][data-glass-effect="gradient"] .summary-card,
+html[data-theme="light"][data-glass-effect="gradient"] .summary-card,
+:root[data-theme="light"][data-glass-effect="gradient"] .modal-content,
+html[data-theme="light"][data-glass-effect="gradient"] .modal-content,
+:root[data-theme="light"][data-glass-effect="gradient"] .chart-container,
+html[data-theme="light"][data-glass-effect="gradient"] .chart-container,
+:root[data-theme="light"][data-glass-effect="gradient"] .summary-info-card,
+html[data-theme="light"][data-glass-effect="gradient"] .summary-info-card,
+:root[data-theme="light"][data-glass-effect="gradient"] .stat-card,
+html[data-theme="light"][data-glass-effect="gradient"] .stat-card,
+:root[data-theme="light"][data-glass-effect="gradient"] .filters-container,
+html[data-theme="light"][data-glass-effect="gradient"] .filters-container {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(167, 139, 250, 0.08)) !important;
+}
+
+/* GLASS по умолчанию */
+[data-glass-effect="glass"] .glass-block,
+[data-glass-effect="glass"] .action-card,
+[data-glass-effect="glass"] .summary-card,
+[data-glass-effect="glass"] .modal-content,
+[data-glass-effect="glass"] .chart-container,
+[data-glass-effect="glass"] .summary-info-card,
+[data-glass-effect="glass"] .stat-card {
+  /* Используем стандартные стили из components/cards.css */
+}

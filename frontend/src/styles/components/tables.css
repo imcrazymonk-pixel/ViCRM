@@ -1,0 +1,136 @@
+/* ===================================
+   ТАБЛИЦЫ (TABLES)
+   =================================== */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-primary);
+}
+
+.data-table th,
+.data-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: rgba(0, 0, 0, 0.3) !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 10px 16px !important;
+}
+
+.data-table tbody tr {
+  transition: all 0.2s;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+/* Zebra - чередование строк */
+.data-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.data-table tbody tr:nth-child(odd) {
+  background: transparent;
+}
+
+.data-table .amount-positive {
+  color: var(--income-primary);
+  font-weight: 600;
+  text-shadow: 0 0 5px var(--income-glow);
+}
+
+.data-table .amount-negative {
+  color: var(--expense-primary);
+  font-weight: 600;
+  text-shadow: 0 0 5px var(--expense-glow);
+}
+
+/* === СТИЛИ ТАБЛИЦ (3 варианта) === */
+
+/* Компактный стиль */
+.table-style-compact .data-table th,
+.table-style-compact .data-table td {
+  padding: 8px 10px !important;
+  font-size: 0.85rem !important;
+}
+
+.table-style-compact .data-table th {
+  font-size: 0.7rem !important;
+  padding: 10px 10px !important;
+}
+
+.table-style-compact .action-btn {
+  padding: 6px 10px !important;
+  font-size: 0.8rem !important;
+}
+
+.table-style-compact .badge-soft {
+  padding: 4px 10px !important;
+  font-size: 0.7rem !important;
+}
+
+/* Ультра-компактный стиль */
+.table-style-ultra .data-table th,
+.table-style-ultra .data-table td {
+  padding: 6px 8px !important;
+  font-size: 0.75rem !important;
+}
+
+.table-style-ultra .data-table th {
+  font-size: 0.65rem !important;
+  padding: 8px 8px !important;
+  letter-spacing: 0.5px !important;
+}
+
+.table-style-ultra .action-btn {
+  padding: 4px 8px !important;
+  font-size: 0.7rem !important;
+}
+
+.table-style-ultra .badge-soft {
+  padding: 3px 8px !important;
+  font-size: 0.65rem !important;
+}
+
+.table-style-ultra .data-table .amount-positive,
+.table-style-ultra .data-table .amount-negative {
+  text-shadow: none !important;
+}
+
+/* Стили для кнопок тегов в таблицах */
+.table-style-compact .transaction-tags .btn {
+  padding: 4px 8px !important;
+  font-size: 0.7rem !important;
+}
+
+.table-style-ultra .transaction-tags .btn {
+  padding: 2px 6px !important;
+  font-size: 0.65rem !important;
+}
+
+.action-btn {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+/* Бейджи */
+.badge-soft {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--accent-secondary);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}

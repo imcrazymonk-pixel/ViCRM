@@ -1,0 +1,40 @@
+// Светлая тема
+[data-theme="light"] {
+  // Фон
+  --body-bg: #f8f9fa;
+  --page-bg: #f8f9fa;
+  
+  // Текст
+  --body-color: #212529;
+  --heading-color: #212529;
+  --muted-color: #6c757d;
+  
+  // Компоненты
+  --card-bg: #ffffff;
+  --card-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  
+  --sidebar-bg: #1a1a2e;
+  --sidebar-color: #ffffff;
+  --sidebar-hover: rgba(255,255,255,0.1);
+  --sidebar-active: #8b5cf6;
+  
+  --header-bg: #ffffff;
+  --header-border: #dee2e6;
+  
+  // Таблицы
+  --table-bg: #ffffff;
+  --table-border: #dee2e6;
+  --table-hover: #f8f9fa;
+  --table-striped: #f8f9fa;
+  
+  // Формы
+  --input-bg: #ffffff;
+  --input-border: #dee2e6;
+  --input-color: #212529;
+  --input-placeholder: #6c757d;
+  --input-focus-border: #8b5cf6;
+  
+  // Графики
+  --chart-grid: rgba(0,0,0,0.1);
+  --chart-text: #666;
+}
