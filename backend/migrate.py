@@ -5,32 +5,37 @@
 import sqlite3
 import os
 
-DB_PATH = r"c:\Users\kovalevaa\Desktop\VPN\Bu\data\ViCRM.db"
+# Путь к БД относительно этого файла
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "ViCRM.db")
+DB_PATH = os.path.abspath(DB_PATH)
 
 def migrate():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    
+
     print("Начало миграции...")
-    
+
     # Добавляем колонки в participants
     columns_to_add = [
         ("group_id", "INTEGER"),
         ("total_paid", "FLOAT DEFAULT 0"),
-        ("paid_until_month", "VARCHAR(7)")
+        ("paid_until_month", "VARCHAR(7)"),
+        ("balance", "FLOAT DEFAULT 0"),
+        ("paused_from", "VARCHAR(7)"),
+        ("paused_to", "VARCHAR(7)")
     ]
-    
+
     for col_name, col_type in columns_to_add:
         try:
             cursor.execute(f"ALTER TABLE participants ADD COLUMN {col_name} {col_type}")
-            print(f"[+] Dobavlena kolonka {col_name} v participants")
+            print(f"[+] Добавлена колонка {col_name} в participants")
         except sqlite3.OperationalError as e:
             if "duplicate column name" in str(e):
-                print(f"[=] Kolonka {col_name} uzhe sushchestvuet")
+                print(f"[=] Колонка {col_name} уже существует")
             else:
                 raise
-    
-    # Sozdaem tablicu participant_groups esli net
+
+    # Создаем таблицу participant_groups если нет
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS participant_groups (
             id INTEGER PRIMARY KEY,
@@ -43,9 +48,23 @@ def migrate():
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    print("[+] Tablica participant_groups sozdana/sushchestvuet")
-    
-    # Sozdaem tablicu monthly_expenses esli net
+    print("[+] Таблица participant_groups создана/существует")
+
+    # Создаем таблицу membership_history если нет
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS membership_history (
+            id INTEGER PRIMARY KEY,
+            participant_id INTEGER NOT NULL,
+            group_id INTEGER NOT NULL,
+            joined_at VARCHAR(7) NOT NULL,
+            left_at VARCHAR(7),
+            reason TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    print("[+] Таблица membership_history создана/существует")
+
+    # Создаем таблицу monthly_expenses если нет
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS monthly_expenses (
             id INTEGER PRIMARY KEY,
@@ -61,28 +80,28 @@ def migrate():
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    print("[+] Tablica monthly_expenses sozdana/sushchestvuet")
-    
-    # Dobavlaem kolonki v contributions
+    print("[+] Таблица monthly_expenses создана/существует")
+
+    # Добавляем колонки в contributions
     contrib_columns = [
         ("is_advance", "BOOLEAN DEFAULT 0"),
         ("paid_at", "DATETIME")
     ]
-    
+
     for col_name, col_type in contrib_columns:
         try:
             cursor.execute(f"ALTER TABLE contributions ADD COLUMN {col_name} {col_type}")
-            print(f"[+] Dobavlena kolonka {col_name} v contributions")
+            print(f"[+] Добавлена колонка {col_name} в contributions")
         except sqlite3.OperationalError as e:
             if "duplicate column name" in str(e):
-                print(f"[=] Kolonka {col_name} uzhe sushchestvuet")
+                print(f"[=] Колонка {col_name} уже существует")
             else:
                 raise
-    
+
     conn.commit()
     conn.close()
-    
-    print("\n[OK] Migraciya zavershena uspeshno!")
+
+    print("\n[OK] Миграция завершена успешно!")
 
 if __name__ == "__main__":
     migrate()

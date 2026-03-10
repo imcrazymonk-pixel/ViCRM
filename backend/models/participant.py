@@ -20,6 +20,8 @@ class Participant(Base):
     total_paid = Column(Float, default=0.0)  # Общая сумма взносов (для быстрого доступа)
     paid_until_month = Column(String(7), nullable=True)  # "2026-05" - до какого месяца оплачено
     balance = Column(Float, default=0.0)  # Персональный баланс (+ аванс, - долг)
+    paused_from = Column(String(7), nullable=True)  # "2026-05" - с какого месяца пауза
+    paused_to = Column(String(7), nullable=True)    # "2026-06" - по какой месяц пауза (включительно)
     created_at = Column(DateTime, default=datetime.now)
 
     group = relationship("ParticipantGroup", back_populates="participants")

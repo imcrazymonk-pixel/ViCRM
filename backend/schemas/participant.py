@@ -20,6 +20,8 @@ class ParticipantUpdate(ParticipantBase):
     start_date: Optional[str] = None
     is_active: Optional[bool] = None
     balance: Optional[float] = None
+    paused_from: Optional[str] = None  # "2026-05"
+    paused_to: Optional[str] = None    # "2026-06"
 
 
 class MembershipHistoryBase(BaseModel):

@@ -42,7 +42,7 @@ async def get_incomes():
 @router.post("")
 async def create_income(transaction: TransactionCreate):
     """
-    Создать доход с учётом start_date и приоритета погашения долгов
+    Создать доход с пересчётом баланса участника
     Защита от дублирования (проверка идентичного платежа за последние 5 секунд)
     """
     if transaction.amount <= 0:
@@ -78,109 +78,10 @@ async def create_income(transaction: TransactionCreate):
         )
         db.add(t)
 
-        # АВТОМАТИЧЕСКОЕ РАСПРЕДЕЛЕНИЕ ПО МЕСЯЦАМ (ВЕРСИЯ 2.0)
-        # Если это взнос участника из группы с monthly_fee
+        # === ПЕРЕСЧЁТ БАЛАНСА УЧАСТНИКА ===
         participant = db.query(Participant).filter(Participant.id == transaction.participant_id).first()
-        if participant and participant.group and participant.is_active:
-            group = participant.group
-            if group.group_type == "contribution" and group.monthly_fee > 0:
-                current_month = datetime.now().strftime("%Y-%m")
-                amount = transaction.amount
-
-                # 1. Определяем первый месяц для расчёта
-                if participant.start_date:
-                    first_month = max(participant.start_date, current_month)
-                else:
-                    first_month = current_month
-                    participant.start_date = current_month
-
-                # 2. Находим месяцы с долгом
-                debt_months = 0
-                if participant.paid_until_month and participant.paid_until_month < current_month:
-                    paid_year, paid_month = map(int, participant.paid_until_month.split('-'))
-                    curr_year, curr_month = map(int, current_month.split('-'))
-                    debt_months = (curr_year - paid_year) * 12 + (curr_month - paid_month)
-
-                # 3. Сначала гасим долги
-                amount_for_debts = debt_months * group.monthly_fee
-                amount_remaining = amount - amount_for_debts
-
-                # 4. Остаток распределяем вперёд
-                if amount_remaining > 0:
-                    advance_months = int(amount_remaining / group.monthly_fee)
-                    balance_copecks = amount_remaining % group.monthly_fee
-                else:
-                    advance_months = 0
-                    balance_copecks = 0
-
-                # 5. Обновляем paid_until_month
-                if advance_months > 0 or debt_months > 0:
-                    if participant.paid_until_month and participant.paid_until_month >= current_month:
-                        year, month = map(int, participant.paid_until_month.split('-'))
-                    else:
-                        year, month = map(int, first_month.split('-'))
-
-                    for _ in range(advance_months):
-                        month += 1
-                        if month > 12:
-                            month = 1
-                            year += 1
-
-                    participant.paid_until_month = f"{year}-{month:02d}"
-                elif amount > 0 and not participant.paid_until_month:
-                    participant.paid_until_month = first_month
-
-                # 6. Обновляем баланс (копейки)
-                participant.balance = balance_copecks
-
-                # 7. Обновляем total_paid
-                participant.total_paid += amount
-
-                # 8. Создаём/обновляем Contribution записи
-                if participant.start_date:
-                    start_year, start_month = map(int, participant.start_date.split('-'))
-                else:
-                    start_year, start_month = map(int, current_month.split('-'))
-
-                if participant.paid_until_month:
-                    end_year, end_month = map(int, participant.paid_until_month.split('-'))
-                    current_year, current_month_num = map(int, current_month.split('-'))
-
-                    year_iter, month_iter = start_year, start_month
-                    month_index = 0
-
-                    while (year_iter < end_year) or (year_iter == end_year and month_iter <= end_month):
-                        month_str = f"{year_iter}-{month_iter:02d}"
-
-                        is_past = (year_iter < current_year) or (year_iter == current_year and month_iter < current_month_num)
-                        is_current = (year_iter == current_year and month_iter == current_month_num)
-
-                        existing = db.query(Contribution).filter(
-                            Contribution.participant_id == participant.id,
-                            Contribution.month == month_str
-                        ).first()
-
-                        if not existing:
-                            contribution = Contribution(
-                                participant_id=participant.id,
-                                month=month_str,
-                                amount_required=group.monthly_fee,
-                                amount_paid=group.monthly_fee,
-                                status="paid",
-                                is_advance=(not is_past and not is_current),
-                                paid_at=transaction.created_at or datetime.now()
-                            )
-                            db.add(contribution)
-                        else:
-                            existing.amount_paid = group.monthly_fee
-                            existing.status = "paid"
-                            existing.paid_at = transaction.created_at or datetime.now()
-
-                        month_iter += 1
-                        if month_iter > 12:
-                            month_iter = 1
-                            year_iter += 1
-                        month_index += 1
+        if participant:
+            recalculate_participant_fields(db, participant)
 
         db.commit()
         db.refresh(t)
@@ -207,7 +108,7 @@ async def delete_income(income_id: int):
             joinedload(Participant.group)
         ).filter(Participant.id == participant_id).first()
 
-        if participant and participant.group and participant.group.monthly_fee > 0:
+        if participant:
             logger.info(f"Пересчёт полей для участника {participant.name} после удаления дохода")
             recalculate_participant_fields(db, participant)
 
@@ -237,7 +138,7 @@ async def update_income(income_id: int, transaction: TransactionCreate):
         t.created_at = transaction.created_at or datetime.now()
 
         participant = db.query(Participant).filter(Participant.id == transaction.participant_id).first()
-        if participant and participant.group and participant.group.monthly_fee > 0:
+        if participant:
             recalculate_participant_fields(db, participant)
 
         db.commit()

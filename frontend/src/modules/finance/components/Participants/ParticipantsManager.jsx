@@ -50,6 +50,13 @@ export const ParticipantsManager = () => {
 
   useEffect(() => {
     loadData()
+    
+    // 🆕 Автообновление данных каждые 30 секунд
+    const intervalId = setInterval(() => {
+      loadData()
+    }, 30000)
+    
+    return () => clearInterval(intervalId)  // Очистка при размонтировании
   }, [])
 
   // Фильтрация
@@ -90,7 +97,23 @@ export const ParticipantsManager = () => {
   // Редактирование участника
   const handleEdit = async (participant) => {
     try {
-      await axios.put(`${API_URL}/participants/${participant.id}`, participant)
+      // 🆕 Если изменилась группа — используем change-group
+      const oldParticipant = participants.find(p => p.id === participant.id)
+      if (oldParticipant && participant.group_id !== oldParticipant.group_id) {
+        // Смена группы через отдельный эндпоинт
+        await axios.post(`${API_URL}/participants/${participant.id}/change-group`, {
+          group_id: participant.group_id
+        })
+        // Обновляем имя, если изменилось
+        if (participant.name !== oldParticipant.name) {
+          await axios.put(`${API_URL}/participants/${participant.id}`, {
+            name: participant.name
+          })
+        }
+      } else {
+        // Обычное обновление (без смены группы)
+        await axios.put(`${API_URL}/participants/${participant.id}`, participant)
+      }
       notifySuccess('Участник обновлён')
       setEditingParticipant(null)
       loadData()

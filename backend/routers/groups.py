@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from database import SessionLocal
 from models.participant import Participant, ParticipantGroup
 from schemas.participant import ParticipantGroupCreate, ParticipantGroupUpdate
+from services.participant_service import recalculate_participant_fields
 from utils.logger import logger
 
 router = APIRouter(prefix="/api/groups", tags=["Groups"])
@@ -80,19 +81,25 @@ async def update_group(group_id: int, group: ParticipantGroupUpdate):
         update_data = group.model_dump(exclude_unset=True)
 
         monthly_fee_changed = 'monthly_fee' in update_data and update_data['monthly_fee'] != g.monthly_fee
-        monthly_fee_warning = None
 
         if monthly_fee_changed:
-            active_participants = [p for p in g.participants if p.is_active]
-            monthly_fee_warning = (
-                f"Ежемесячный платёж изменён с {g.monthly_fee} на {update_data['monthly_fee']}. "
-                f"Балансы участников не пересчитаны. Затронуто активных участников: {len(active_participants)}. "
-                f"Новый тариф применяется к будущим платежам."
-            )
-            logger.warning(f"Группа {g.name}: monthly_fee изменён с {g.monthly_fee} на {update_data['monthly_fee']}")
+            # Сохраняем старый monthly_fee для лога
+            old_fee = g.monthly_fee
 
         for field, value in update_data.items():
             setattr(g, field, value)
+
+        # === ПЕРЕСЧЁТ УЧАСТНИКОВ ПРИ ИЗМЕНЕНИИ monthly_fee ===
+        if monthly_fee_changed:
+            recalculated = 0
+            for p in g.participants:
+                if p.is_active:
+                    old_balance = p.balance
+                    recalculate_participant_fields(db, p)
+                    if p.balance != old_balance:
+                        recalculated += 1
+            db.commit()
+            logger.info(f"Группа {g.name}: monthly_fee изменён с {old_fee} на {update_data['monthly_fee']}. Пересчитано {recalculated} участников.")
 
         db.commit()
 
@@ -100,7 +107,7 @@ async def update_group(group_id: int, group: ParticipantGroupUpdate):
             "id": g.id,
             "success": True,
             "monthly_fee_changed": monthly_fee_changed,
-            "monthly_fee_warning": monthly_fee_warning
+            "recalculated_participants": recalculated if monthly_fee_changed else 0
         }
     finally:
         db.close()

@@ -2,7 +2,7 @@
 Роутер для работы с участниками ViCRM
 """
 from typing import Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from datetime import datetime
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -34,6 +34,8 @@ async def get_participants():
             "balance": p.balance,
             "total_paid": p.total_paid,
             "paid_until_month": p.paid_until_month,
+            "paused_from": p.paused_from,
+            "paused_to": p.paused_to,
             "created_at": p.created_at.isoformat() if p.created_at else None,
             "total_incomes": sum(i.amount for i in p.incomes),
             "total_expenses": sum(e.amount for e in p.expenses),
@@ -99,7 +101,10 @@ async def create_participant(participant: ParticipantCreate, allow_duplicate: bo
 
 @router.put("/{participant_id}")
 async def update_participant(participant_id: int, participant: ParticipantUpdate):
-    """Обновить участника"""
+    """Обновить участника (имя, start_date, is_active, paused_from, paused_to)
+
+    ⚠️ Для смены группы используйте POST /api/participants/{id}/change-group
+    """
     if not participant.name or not participant.name.strip():
         raise HTTPException(status_code=400, detail="Имя не может быть пустым")
 
@@ -111,43 +116,12 @@ async def update_participant(participant_id: int, participant: ParticipantUpdate
 
         p.name = participant.name.strip()
 
-        # Обновляем группу с записью в историю
-        # 🆕 Проверяем изменение группы (включая смену на NULL/без группы)
-        group_changed = (
-            (p.group_id is not None and participant.group_id is None) or  # Была группа → стала NULL
-            (p.group_id is None and participant.group_id is not None) or  # Была NULL → стала группа
-            (p.group_id is not None and participant.group_id is not None and p.group_id != participant.group_id)  # Смена группы
-        )
-        
-        if group_changed:
-            old_group_id = p.group_id
-            # Если была группа, закрываем запись
-            if old_group_id:
-                current_month = datetime.now().strftime("%Y-%m")
-                active_membership = db.query(MembershipHistory).filter(
-                    MembershipHistory.participant_id == participant_id,
-                    MembershipHistory.group_id == old_group_id,
-                    MembershipHistory.left_at == None
-                ).first()
-                if active_membership:
-                    active_membership.left_at = current_month
-                    active_membership.reason = "Смена группы"
-
-            # Создаём новую запись для новой группы
-            if participant.group_id:
-                new_membership = MembershipHistory(
-                    participant_id=participant_id,
-                    group_id=participant.group_id,
-                    joined_at=datetime.now().strftime("%Y-%m"),
-                    left_at=None,
-                    reason=None
-                )
-                db.add(new_membership)
-
-            p.group_id = participant.group_id
-
-            # 🆕 Пересчитываем поля участника после смены группы
-            recalculate_participant_fields(db, p)
+        # ⚠️ Блокируем смену группы через PUT — используйте change-group
+        if participant.group_id is not None and participant.group_id != p.group_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Для смены группы используйте POST /api/participants/{id}/change-group"
+            )
 
         # Обновляем start_date
         if participant.start_date is not None:
@@ -160,6 +134,15 @@ async def update_participant(participant_id: int, participant: ParticipantUpdate
         # 🆕 Обновляем баланс только если явно передан (не None)
         if participant.balance is not None:
             p.balance = participant.balance
+
+        # 🆕 Обновляем поля паузы
+        if participant.paused_from is not None:
+            p.paused_from = participant.paused_from
+        if participant.paused_to is not None:
+            p.paused_to = participant.paused_to
+
+        # 🆕 Пересчитываем поля при обновлении
+        recalculate_participant_fields(db, p)
 
         db.commit()
         return {"id": p.id, "name": p.name, "start_date": p.start_date, "is_active": p.is_active}
@@ -185,7 +168,11 @@ async def delete_participant(participant_id: int):
 
 
 @router.post("/{participant_id}/activate")
-async def activate_participant(participant_id: int, group_id: int, start_date: Optional[str] = None):
+async def activate_participant(
+    participant_id: int,
+    group_id: int = Body(..., embed=True),
+    start_date: Optional[str] = Body(None, embed=True)
+):
     """Активировать участника в группе"""
     db = SessionLocal()
     try:
@@ -215,6 +202,9 @@ async def activate_participant(participant_id: int, group_id: int, start_date: O
             reason="Активация"
         )
         db.add(membership)
+
+        # === ПЕРЕСЧЁТ ПОЛЕЙ ===
+        recalculate_participant_fields(db, p)
 
         db.commit()
         return {"success": True, "participant_id": participant_id, "group_id": group_id, "start_date": start_date}
@@ -272,7 +262,11 @@ async def deactivate_participant(participant_id: int, reason: Optional[str] = No
 
 
 @router.post("/{participant_id}/change-group")
-async def change_participant_group(participant_id: int, group_id: int, reason: Optional[str] = None):
+async def change_participant_group(
+    participant_id: int,
+    group_id: int = Body(..., embed=True),
+    reason: Optional[str] = Body(None, embed=True)
+):
     """Сменить группу участнику с пересчётом баланса"""
     db = SessionLocal()
     try:
@@ -291,26 +285,34 @@ async def change_participant_group(participant_id: int, group_id: int, reason: O
         old_group = db.query(ParticipantGroup).filter(ParticipantGroup.id == old_group_id).first() if old_group_id else None
 
         current_month = datetime.now().strftime("%Y-%m")
+        curr_year, curr_month = map(int, current_month.split('-'))
 
-        # 1. Находим остаток оплаченных месяцев
+        # === 1. Считаем остаток оплаченных месяцев от paid_until_month ===
         remaining_months = 0
         if p.paid_until_month and p.paid_until_month >= current_month:
             paid_year, paid_month = map(int, p.paid_until_month.split('-'))
-            curr_year, curr_month = map(int, current_month.split('-'))
             remaining_months = (paid_year - curr_year) * 12 + (paid_month - curr_month)
+            # +1 потому что paid_until_month включает текущий месяц
+            remaining_months += 1
 
-        # 2. Конвертируем в рубли по старому тарифу
+        # === 2. Конвертируем в рубли по СТАРОЙ группе ===
+        # (это сумма, которая ещё не списана)
         balance_in_rubles = 0.0
         if old_group and old_group.monthly_fee > 0:
             balance_in_rubles = remaining_months * old_group.monthly_fee + p.balance
+        else:
+            balance_in_rubles = p.balance
 
-        # 3. Конвертируем в месяцы по новому тарифу
-        new_remaining_months = int(balance_in_rubles / new_group.monthly_fee)
-        new_balance = balance_in_rubles % new_group.monthly_fee
+        # === 3. Конвертируем в месяцы по НОВОЙ группе ===
+        if new_group.monthly_fee > 0:
+            new_remaining_months = int(balance_in_rubles / new_group.monthly_fee)
+            new_balance = balance_in_rubles % new_group.monthly_fee
+        else:
+            new_remaining_months = 0
+            new_balance = balance_in_rubles
 
-        # 4. Обновляем paid_until_month
+        # === 4. Обновляем paid_until_month ===
         if new_remaining_months > 0:
-            curr_year, curr_month = map(int, current_month.split('-'))
             total_months = curr_month + new_remaining_months - 1
             new_year = curr_year + (total_months - 1) // 12
             new_month = (total_months - 1) % 12 + 1
@@ -318,11 +320,11 @@ async def change_participant_group(participant_id: int, group_id: int, reason: O
         else:
             p.paid_until_month = None
 
-        # 5. Обновляем группу и баланс
+        # === 5. Обновляем группу и баланс ===
         p.group_id = group_id
         p.balance = new_balance
 
-        # 6. Создаём запись в MembershipHistory
+        # === 6. Создаём запись в MembershipHistory ===
         if old_group_id:
             active_membership = db.query(MembershipHistory).filter(
                 MembershipHistory.participant_id == participant_id,
@@ -349,6 +351,9 @@ async def change_participant_group(participant_id: int, group_id: int, reason: O
             "participant_id": participant_id,
             "old_group_id": old_group_id,
             "new_group_id": group_id,
+            "old_monthly_fee": old_group.monthly_fee if old_group else 0,
+            "new_monthly_fee": new_group.monthly_fee,
+            "remaining_months_old_group": remaining_months,
             "balance_in_rubles": balance_in_rubles,
             "new_remaining_months": new_remaining_months,
             "new_balance": new_balance,

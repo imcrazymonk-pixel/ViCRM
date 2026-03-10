@@ -32,8 +32,9 @@ Base.metadata.create_all(bind=engine)
 
 # === ИНИЦИАЛИЗАЦИЯ БД ===
 def init_db():
-    """Инициализация базы данных - категории"""
+    """Инициализация базы данных - категории + пересчёт участников"""
     from config import DEFAULT_INCOME_CATEGORIES, DEFAULT_EXPENSE_CATEGORIES
+    from services.participant_service import recalculate_participant_fields
 
     db = next(get_db())
     try:
@@ -48,6 +49,19 @@ def init_db():
                 db.add(ExpenseCategory(name=cat_name))
 
         db.commit()
+        logger.info("Категории инициализированы")
+
+        # === ПЕРЕСЧЁТ ВСЕХ УЧАСТНИКОВ ===
+        participants = db.query(Participant).all()
+        recalculated = 0
+        for p in participants:
+            old_balance = p.balance
+            recalculate_participant_fields(db, p)
+            if p.balance != old_balance:
+                recalculated += 1
+
+        db.commit()
+        logger.info(f"Пересчитано {recalculated} из {len(participants)} участников")
         logger.info("База данных успешно инициализирована")
     except Exception as e:
         logger.exception(f"Ошибка инициализации БД: {e}")
