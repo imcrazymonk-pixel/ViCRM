@@ -16,7 +16,8 @@ class Income(Base):
     participant_id = Column(Integer, ForeignKey("participants.id"), nullable=False)
     category_id = Column(Integer, ForeignKey("income_categories.id"), nullable=False)
     amount = Column(Float, nullable=False)
-    currency = Column(String(3), default='RUB')
+    currency = Column(String(3), default='RUB')  # RUB, USD, EUR
+    amount_base = Column(Float, nullable=True)  # Сумма в базовой валюте
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.now, index=True)
 
@@ -32,7 +33,8 @@ class Expense(Base):
     participant_id = Column(Integer, ForeignKey("participants.id"), nullable=False)
     category_id = Column(Integer, ForeignKey("expense_categories.id"), nullable=False)
     amount = Column(Float, nullable=False)
-    currency = Column(String(3), default='RUB')
+    currency = Column(String(3), default='RUB')  # RUB, USD, EUR
+    amount_base = Column(Float, nullable=True)  # Сумма в базовой валюте
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.now, index=True)
 

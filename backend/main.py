@@ -13,9 +13,6 @@ from models import (
     Participant, ParticipantGroup, MembershipHistory,
     Income, Expense, Contribution,
     IncomeCategory, ExpenseCategory,
-    Tag, TransactionTag,
-    TransactionTemplate,
-    CurrencyRate,
     MonthlyExpense
 )
 from routers import (
@@ -24,9 +21,6 @@ from routers import (
     incomes_router,
     expenses_router,
     categories_router,
-    tags_router,
-    templates_router,
-    currencies_router,
     contributions_router,
     forecast_router,
     backup_router
@@ -38,9 +32,9 @@ Base.metadata.create_all(bind=engine)
 
 # === ИНИЦИАЛИЗАЦИЯ БД ===
 def init_db():
-    """Инициализация базы данных - категории и курсы валют"""
-    from config import DEFAULT_INCOME_CATEGORIES, DEFAULT_EXPENSE_CATEGORIES, DEFAULT_CURRENCY_RATES
-    
+    """Инициализация базы данных - категории"""
+    from config import DEFAULT_INCOME_CATEGORIES, DEFAULT_EXPENSE_CATEGORIES
+
     db = next(get_db())
     try:
         # Категории доходов
@@ -52,12 +46,6 @@ def init_db():
         for cat_name in DEFAULT_EXPENSE_CATEGORIES:
             if not db.query(ExpenseCategory).filter(ExpenseCategory.name == cat_name).first():
                 db.add(ExpenseCategory(name=cat_name))
-
-        # Курсы валют
-        for code, rate in DEFAULT_CURRENCY_RATES.items():
-            existing = db.query(CurrencyRate).filter(CurrencyRate.currency_code == code).first()
-            if not existing:
-                db.add(CurrencyRate(currency_code=code, rate_to_base=rate))
 
         db.commit()
         logger.info("База данных успешно инициализирована")
@@ -130,9 +118,6 @@ app.include_router(groups_router)
 app.include_router(incomes_router)
 app.include_router(expenses_router)
 app.include_router(categories_router)
-app.include_router(tags_router)
-app.include_router(templates_router)
-app.include_router(currencies_router)
 app.include_router(contributions_router)
 app.include_router(forecast_router)
 app.include_router(backup_router)
@@ -143,11 +128,11 @@ app.include_router(backup_router)
 async def get_summary():
     """Получить сводку по финансам"""
     from sqlalchemy import select, func
-    
+
     db = next(get_db())
     try:
-        total_income = db.scalar(select(func.sum(Income.amount_base))) or 0
-        total_expense = db.scalar(select(func.sum(Expense.amount_base))) or 0
+        total_income = db.scalar(select(func.sum(Income.amount))) or 0
+        total_expense = db.scalar(select(func.sum(Expense.amount))) or 0
         balance = total_income - total_expense
 
         participants_count = db.query(Participant).count()

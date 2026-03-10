@@ -35,13 +35,6 @@ ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:3000"]
 LOG_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
 LOG_BACKUP_COUNT = 5
 
-# === КУРСЫ ВАЛЮТ ПО УМОЛЧАНИЮ ===
-DEFAULT_CURRENCY_RATES = {
-    'RUB': 1.0,
-    'USD': 90.0,
-    'EUR': 97.0
-}
-
 # === КАТЕГОРИИ ПО УМОЛЧАНИЮ ===
 DEFAULT_INCOME_CATEGORIES = ["Взнос участника", "Пожертвование", "Прибыль", "Другое"]
 DEFAULT_EXPENSE_CATEGORIES = ["Сервер", "Хостинг", "Услуги", "Реклама", "Налоги", "Другое"]

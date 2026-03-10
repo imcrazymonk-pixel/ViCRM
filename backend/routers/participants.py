@@ -112,7 +112,14 @@ async def update_participant(participant_id: int, participant: ParticipantUpdate
         p.name = participant.name.strip()
 
         # Обновляем группу с записью в историю
-        if participant.group_id is not None and participant.group_id != p.group_id:
+        # 🆕 Проверяем изменение группы (включая смену на NULL/без группы)
+        group_changed = (
+            (p.group_id is not None and participant.group_id is None) or  # Была группа → стала NULL
+            (p.group_id is None and participant.group_id is not None) or  # Была NULL → стала группа
+            (p.group_id is not None and participant.group_id is not None and p.group_id != participant.group_id)  # Смена группы
+        )
+        
+        if group_changed:
             old_group_id = p.group_id
             # Если была группа, закрываем запись
             if old_group_id:
@@ -139,6 +146,9 @@ async def update_participant(participant_id: int, participant: ParticipantUpdate
 
             p.group_id = participant.group_id
 
+            # 🆕 Пересчитываем поля участника после смены группы
+            recalculate_participant_fields(db, p)
+
         # Обновляем start_date
         if participant.start_date is not None:
             p.start_date = participant.start_date
@@ -147,7 +157,7 @@ async def update_participant(participant_id: int, participant: ParticipantUpdate
         if participant.is_active is not None:
             p.is_active = participant.is_active
 
-        # Обновляем баланс
+        # 🆕 Обновляем баланс только если явно передан (не None)
         if participant.balance is not None:
             p.balance = participant.balance
 

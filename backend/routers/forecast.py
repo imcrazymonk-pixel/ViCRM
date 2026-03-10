@@ -20,8 +20,8 @@ async def get_finance_forecast(months_ahead: int = 6):
     db = SessionLocal()
     try:
         # 1. Текущий баланс (доходы - расходы)
-        total_income = db.query(func.sum(Income.amount_base)).scalar() or 0
-        total_expense = db.query(func.sum(Expense.amount_base)).scalar() or 0
+        total_income = db.query(func.sum(Income.amount)).scalar() or 0
+        total_expense = db.query(func.sum(Expense.amount)).scalar() or 0
         current_balance = total_income - total_expense
 
         # 2. Ежемесячные доходы (взносы ТОЛЬКО АКТИВНЫХ участников)

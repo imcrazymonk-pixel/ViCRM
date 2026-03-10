@@ -11,6 +11,7 @@ from models.transaction import Expense
 from models.expense import MonthlyExpense
 from schemas.transaction import TransactionCreate
 from schemas.expense import MonthlyExpenseCreate, MonthlyExpenseUpdate
+from services.currency_service import get_currency_rate
 
 router = APIRouter(prefix="/api", tags=["Expenses"])
 
@@ -30,6 +31,7 @@ async def get_expenses():
             "category_name": e.category.name,
             "amount": e.amount,
             "currency": e.currency,
+            "amount_base": e.amount_base,
             "description": e.description,
             "created_at": e.created_at.isoformat() if e.created_at else None
         } for e in expenses]
@@ -45,11 +47,13 @@ async def create_expense(transaction: TransactionCreate):
 
     db = SessionLocal()
     try:
+        rate = get_currency_rate(db, transaction.currency)
         t = Expense(
             participant_id=transaction.participant_id,
             category_id=transaction.category_id,
             amount=transaction.amount,
             currency=transaction.currency,
+            amount_base=transaction.amount * rate,
             description=transaction.description,
             created_at=transaction.created_at or datetime.now()
         )
@@ -88,10 +92,12 @@ async def update_expense(expense_id: int, transaction: TransactionCreate):
         if not t:
             raise HTTPException(status_code=404, detail="Транзакция не найдена")
 
+        rate = get_currency_rate(db, transaction.currency)
         t.participant_id = transaction.participant_id
         t.category_id = transaction.category_id
         t.amount = transaction.amount
         t.currency = transaction.currency
+        t.amount_base = transaction.amount * rate
         t.description = transaction.description
         t.created_at = transaction.created_at or datetime.now()
 
@@ -207,6 +213,7 @@ async def pay_monthly_expense(expense_id: int, month: Optional[str] = None):
                 description=f"Ежемесячный платёж: {e.name} за {month}",
                 created_at=datetime.now()
             )
+            expense.amount_base = e.amount
             db.add(expense)
 
         db.commit()

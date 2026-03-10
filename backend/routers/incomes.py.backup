@@ -12,6 +12,7 @@ from models.participant import Participant, ParticipantGroup, MembershipHistory
 from models.transaction import Income, Contribution
 from models.category import IncomeCategory
 from schemas.transaction import TransactionCreate
+from services.currency_service import get_currency_rate
 from services.participant_service import recalculate_participant_fields
 from utils.logger import logger
 
@@ -32,6 +33,7 @@ async def get_incomes():
             "category_name": i.category.name,
             "amount": i.amount,
             "currency": i.currency,
+            "amount_base": i.amount_base,
             "description": i.description,
             "created_at": i.created_at.isoformat() if i.created_at else None
         } for i in incomes]
@@ -68,11 +70,13 @@ async def create_income(transaction: TransactionCreate):
                     detail="Этот платёж уже был внесён несколько секунд назад. Возможно, вы нажали кнопку дважды."
                 )
 
+        rate = get_currency_rate(db, transaction.currency)
         t = Income(
             participant_id=transaction.participant_id,
             category_id=transaction.category_id,
             amount=transaction.amount,
             currency=transaction.currency,
+            amount_base=transaction.amount * rate,
             description=transaction.description,
             created_at=transaction.created_at or datetime.now()
         )
@@ -229,10 +233,12 @@ async def update_income(income_id: int, transaction: TransactionCreate):
         if not t:
             raise HTTPException(status_code=404, detail="Транзакция не найдена")
 
+        rate = get_currency_rate(db, transaction.currency)
         t.participant_id = transaction.participant_id
         t.category_id = transaction.category_id
         t.amount = transaction.amount
         t.currency = transaction.currency
+        t.amount_base = transaction.amount * rate
         t.description = transaction.description
         t.created_at = transaction.created_at or datetime.now()
 
